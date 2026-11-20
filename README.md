@@ -57,6 +57,15 @@ par jour d'ancienneté ; le flux TripUpdates (~3 Mo) est interrogé à chaque ra
 du widget. Les `trip_id` du flux temps réel ont été vérifiés 100 % compatibles avec le
 GTFS courant le 20/11/2026.
 
+## Page web (sans application)
+
+`web/index.html` est une page autonome (HTML + JS vanilla, sans dépendance) affichant les
+mêmes informations avec les mêmes règles : horaire planifié embarqué (`web/schedule24.json`,
+généré par `web/tools/generate_schedule.py`), temps réel GTFS-RT interrogé directement par le
+navigateur (CORS ouvert sur transport.data.gouv.fr). Publiez simplement les deux fichiers.
+La logique pure (débogage/test possible avec node) se trouve dans le bloc
+`<script id="pure">` de la page ; voir BACKLOG.md pour les évolutions prévues.
+
 ## Compiler
 
 ```bash
