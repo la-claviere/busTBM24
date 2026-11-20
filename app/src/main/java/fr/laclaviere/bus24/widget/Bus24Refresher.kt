@@ -4,12 +4,15 @@ import android.app.AlarmManager
 import android.app.PendingIntent
 import android.content.Context
 import android.content.Intent
+import android.os.Build
 import android.os.SystemClock
 
 /**
  * Planification du rafraîchissement du widget : toutes les ~60 s quand un passage est
- * proche (< 45 min), sinon toutes les 5 min. AlarmManager en mode non exact (aucune
- * permission spéciale requise), re-programmé à chaque tick par Bus24UpdateReceiver.
+ * proche (< 45 min), sinon toutes les 5 min. Alarme exacte autorisée pendant l'inactivité
+ * quand le système l'accepte (SCHEDULE_EXACT_ALARM — l'utilisateur peut la retirer, d'où
+ * le repli sur setWindow), re-programmée à chaque tick par Bus24UpdateReceiver et après
+ * chaque redémarrage par Bus24BootReceiver.
  */
 object Bus24Refresher {
 
@@ -27,7 +30,17 @@ object Bus24Refresher {
         val intervalMs =
             if (Bus24State.serviceActiveSoon(context)) 60_000L else NORMAL_INTERVAL_MS
         val triggerAt = SystemClock.elapsedRealtime() + intervalMs
-        alarm.setWindow(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAt, intervalMs / 2, pending)
+        val exactAllowed =
+            Build.VERSION.SDK_INT < Build.VERSION_CODES.S || alarm.canScheduleExactAlarms()
+        try {
+            if (exactAllowed) {
+                alarm.setExactAndAllowWhileIdle(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAt, pending)
+            } else {
+                alarm.setWindow(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAt, intervalMs / 2, pending)
+            }
+        } catch (_: SecurityException) {
+            alarm.setWindow(AlarmManager.ELAPSED_REALTIME_WAKEUP, triggerAt, intervalMs / 2, pending)
+        }
     }
 
     fun cancel(context: Context) {

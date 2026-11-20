@@ -54,6 +54,13 @@ data class Bus24State(
             return primary - nowSec < NEXT_HORIZON_SEC
         }
 
+        /** Les données affichées datent-elles de plus de maxAgeMs ? (heartbeat widget) */
+        fun isStale(context: Context, maxAgeMs: Long): Boolean {
+            val loaded = load(context) ?: return true
+            return System.currentTimeMillis() - loaded.fetchedAtMs > maxAgeMs
+        }
+
         const val NEXT_HORIZON_SEC = 45L * 60
+        const val STALE_MS = 5L * 60 * 1000
     }
 }

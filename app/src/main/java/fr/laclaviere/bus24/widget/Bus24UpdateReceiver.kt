@@ -40,6 +40,23 @@ class Bus24UpdateReceiver : BroadcastReceiver() {
     companion object {
         private val ZONE: ZoneId = ZoneId.of("Europe/Paris")
 
+        /**
+         * Rafraîchissement hors broadcast (heartbeat onUpdate du widget) : thread simple,
+         * puis re-programmation de l'alarme.
+         */
+        fun requestRefresh(context: Context) {
+            thread(name = "bus24-widget-heartbeat") {
+                try {
+                    refreshNow(context)
+                } catch (_: Exception) {
+                }
+                try {
+                    Bus24Refresher.scheduleNext(context)
+                } catch (_: Exception) {
+                }
+            }
+        }
+
         fun refreshNow(context: Context) {
             val store = GtfsStore(context.cacheDir)
             try {

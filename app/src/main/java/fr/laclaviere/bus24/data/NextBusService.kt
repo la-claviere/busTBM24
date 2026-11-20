@@ -57,10 +57,15 @@ class NextBusService {
             for (dep in data.departures) {
                 if (dep.serviceId !in active) continue
                 val plannedEpoch = dayStart + dep.offsetSeconds
-                if (plannedEpoch < nowUtc - GRACE_PAST_SEC) continue
+                // Tolérance élargie : un trajet retardé par le temps réel peut être encore
+                // à venir bien après son heure planifiée.
+                if (plannedEpoch < nowUtc - RT_LOOKBACK_SEC) continue
                 candidates.add(combine(dep, plannedEpoch, rtMap))
             }
         }
+        // Ne garder que les passages à venir à l'heure estimée finale (temps réel
+        // appliqué) : un bus déjà parti à l'arrêt n'est plus affiché.
+        candidates.removeAll { it.epochUtc < nowUtc - GRACE_PAST_SEC }
         candidates.sortBy { it.epochUtc }
         return candidates.take(maxResults)
     }
@@ -105,6 +110,9 @@ class NextBusService {
     companion object {
         /** Tolérance : un passage très récemment passé reste affichable quelques secondes. */
         const val GRACE_PAST_SEC = 30L
+
+        /** Fenêtre de rattrapage du temps réel : horaires planifiés jusqu'à 45 min passés. */
+        const val RT_LOOKBACK_SEC = 45L * 60
 
         private val HHMM = DateTimeFormatter.ofPattern("HH:mm")
 

@@ -21,6 +21,11 @@ class Bus24WidgetProvider : AppWidgetProvider() {
     override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
         appWidgetManager.updateAppWidget(appWidgetIds, renderFromState(context))
         Bus24Refresher.scheduleNext(context)
+        // Heartbeat : si les données sont périmées (alarme manquée, redémarrage, Doze),
+        // on recharge les données ici — la mise à jour système périodique (~30 min).
+        if (Bus24State.isStale(context, Bus24State.STALE_MS)) {
+            Bus24UpdateReceiver.requestRefresh(context)
+        }
     }
 
     override fun onEnabled(context: Context) {
@@ -61,7 +66,7 @@ class Bus24WidgetProvider : AppWidgetProvider() {
             )
 
             if (state == null) {
-                views.setTextViewText(R.id.widget_primary, "")
+                views.setTextViewText(R.id.widget_primary, "—")
                 views.setTextColor(R.id.widget_primary, GRAY)
                 views.setViewVisibility(R.id.widget_primary, View.VISIBLE)
                 views.setViewVisibility(R.id.widget_flipper, View.GONE)

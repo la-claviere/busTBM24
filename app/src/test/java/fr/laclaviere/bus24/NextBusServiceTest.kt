@@ -115,6 +115,35 @@ class NextBusServiceTest {
     }
 
     @Test
+    fun `le bus déjà parti à l'heure estimée n'est pas affiché`() {
+        val data = gtfs("t1" to 51_600L, "t2" to 52_920L)
+        val planned1 = epochOf("14:20:00")
+        val rt = mapOf("t1" to tripWithStop("t1", departureEpoch = planned1 + 360))
+        val now = planned1 + 660
+        val passages = NextBusService().nextPassages(
+            data, routeId, stopId, nowUtc = now, zone = zone, rtMap = rt,
+        )
+        assertTrue(passages.none { it.plannedEpochUtc == planned1 })
+        assertEquals(1, passages.size)
+        assertEquals(epochOf("14:42:00"), passages[0].epochUtc)
+    }
+
+    @Test
+    fun `un bus retardé au-delà de son heure planifiée reste affiché`() {
+        val data = gtfs("t1" to 50_700L, "t2" to 52_920L)
+        val planned1 = epochOf("14:05:00")
+        val rt = mapOf("t1" to tripWithStop("t1", departureEpoch = planned1 + 2_400))
+        val now = planned1 + 900
+        val passages = NextBusService().nextPassages(
+            data, routeId, stopId, nowUtc = now, zone = zone, rtMap = rt,
+        )
+        assertEquals(2, passages.size)
+        val delayed = passages.first { it.plannedEpochUtc == planned1 }
+        assertEquals(planned1 + 2_400, delayed.epochUtc)
+        assertTrue(delayed.realtime)
+    }
+
+    @Test
     fun `le passage annulé est suivi du passage suivant`() {
         val data = gtfs("t1" to 52_320L, "t2" to 52_920L)
         val planned1 = epochOf("14:32:00")

@@ -66,3 +66,19 @@ GTFS courant le 20/11/2026.
 
 Prérequis : Android Studio ou SDK Android 35 (variable `ANDROID_HOME`).
 Voir [SPEC.md](SPEC.md) pour les user stories complètes.
+
+## Rafraîchissement du widget et batterie
+
+Le widget se met à jour par alarme (~60 s si un passage est à moins de 45 min, sinon
+~5 min), re-programmée après chaque tick, après un redémarrage du téléphone et via le
+heartbeat système du widget. Sur Android 12+ l'alarme est exacte ; si le réglage
+« Alarmes et rappels » est refusé, le repli se fait sur des alarmes approchées qui
+peuvent être différées de quelques minutes.
+
+Si le widget reste figé sur certains téléphones (optimisations batterie agressives de
+certains constructeurs) : désactivez l'optimisation de batterie pour BusTBM24
+(*Paramètres → Applications → BusTBM24 → Batterie → Sans restriction*), et accordez
+« Alarmes et rappels » si le téléphone le propose.
+
+Seuls les horaires à venir sont affichés : un bus déjà passé à l'arrêt disparaît ; un
+bus retardé reste visible jusqu'à son nouveau passage réel.
