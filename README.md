@@ -59,8 +59,9 @@ GTFS courant le 20/11/2026.
 
 ## Page web (sans application)
 
-`web/index.html` est une page autonome (HTML + JS vanilla, sans dépendance) affichant les
-mêmes informations avec les mêmes règles : horaire planifié embarqué (`web/schedule24.json`,
+`web/index.html` est une page autonome (HTML + JS vanilla, sans dépendance) affichant
+les deux sens de la ligne en deux colonnes (Romainville = quai A / 815, Bordeaux centre
+= quai R / 281) avec les mêmes règles d'affichage que l'application : horaire planifié embarqué (`web/schedule24.json`,
 généré par `web/tools/generate_schedule.py`), temps réel GTFS-RT interrogé directement par le
 navigateur, en interrogeant l'URL finale directe du flux GTFS-RT (`bdx.mecatran.com`, clé
 `apiKey` publique publiée dans les métadonnées du portail open data) : la redirection

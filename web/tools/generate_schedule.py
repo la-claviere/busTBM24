@@ -5,9 +5,10 @@ Usage :
     python3 generate_schedule.py
 
 Télécharge le GTFS statique (transport.data.gouv.fr ressource 83024), filtre la
-ligne 24 à l'arrêt 815 (Fauré, quai A, direction Pessac Romainville) et écrit
-l'horaire compact embarqué par web/index.html. À relancer à chaque révision de
-l'offre (voir BACKLOG.md — offre courante valable jusqu'au 02/07/2027).
+ligne 24 aux deux quais de l'arrêt Fauré à Pessac (815 = quai A, direction Pessac
+Romainville ; 281 = quai R, direction Bordeaux centre) et écrit l'horaire compact
+embarqué par web/index.html. À relancer à chaque révision de l'offre (voir
+BACKLOG.md — offre courante valable jusqu'au 02/07/2027).
 """
 import csv
 import io
@@ -19,7 +20,8 @@ import zipfile
 
 GTFS_URL = "https://transport.data.gouv.fr/resources/83024/download"
 ROUTE_SHORT_NAME = "24"
-STOP_ID = "815"
+# slot 1 = quai A (815, sens Romainville) ; slot 2 = quai R (281, sens Bordeaux centre)
+STOP_SLOTS = {"815": 1, "281": 2}
 DAYS = ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"]
 HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.normpath(os.path.join(HERE, "..", "schedule24.json"))
@@ -47,12 +49,16 @@ def main() -> None:
         sched = {}
         with io.open("stop_times.txt", encoding="utf-8-sig", errors="replace") as f:
             for row in csv.DictReader(f):
-                if row["trip_id"] in trips and row["stop_id"] == STOP_ID and row["trip_id"] not in sched:
+                slot = STOP_SLOTS.get(row["stop_id"])
+                if row["trip_id"] not in trips or slot is None:
+                    continue
+                entry = sched.setdefault(
+                    row["trip_id"],
+                    [trips[row["trip_id"]]["service_id"], None, None],
+                )
+                if entry[slot] is None:
                     h, m, s = row["departure_time"].split(":")
-                    sched[row["trip_id"]] = [
-                        trips[row["trip_id"]]["service_id"],
-                        int(h) * 3600 + int(m) * 60 + int(s),
-                    ]
+                    entry[slot] = int(h) * 3600 + int(m) * 60 + int(s)
 
         calendar = []
         for row in read_csv("calendar.txt"):
@@ -69,7 +75,9 @@ def main() -> None:
     out = {
         "calendar": calendar,
         "exceptions": exceptions,
-        "trips": dict(sorted(sched.items(), key=lambda kv: (kv[1][1], kv[0]))),
+        "trips": dict(sorted(sched.items(),
+                             key=lambda kv: (min(x for x in kv[1][1:] if x is not None),
+                                             kv[0]))),
         "valid_from": min(c[2] for c in calendar),
         "valid_until": max(c[3] for c in calendar),
     }
