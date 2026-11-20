@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="tbm_teal">#00A98B</color>
+    <color name="realtime_blue">#2165C0</color>
+    <color name="alert_red">#D32F2F</color>
+    <color name="alert_red_dim">#66D32F2F</color>
+    <color name="text_black">#111111</color>
+    <color name="text_gray">#666666</color>
+    <color name="widget_bg">#F7F7F5</color>
+    <color name="widget_border">#DDD9D4</color>
+</resources>
