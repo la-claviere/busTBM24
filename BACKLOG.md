@@ -12,7 +12,9 @@
 - [ ] **Résoudre dynamiquement les URLs des ressources transport.data.gouv.fr** via
   l'API (`https://transport.data.gouv.fr/api/datasets`) au lieu des IDs numériques
   figés (`resources/83024/download`, `resources/83025/download`) : les IDs peuvent
-  changer d'une révision du jeu de données à l'autre.
+  changer d'une révision du jeu de données à l'autre. La page web dépend en plus de
+  l'URL finale directe `bdx.mecatran.com` (contournement CORS — voir README) : si
+  l'éditeur change l'URL ou la clé publique, la page cessera d'afficher le temps réel.
 - [ ] **Régénérer l'horaire embarqué de la page web** à chaque révision du GTFS :
   l'offre courante est valable jusqu'au 02/07/2027 ; au-delà, régénérer le fichier
   (script : `web/tools/generate_schedule.py`).

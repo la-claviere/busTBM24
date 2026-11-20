@@ -64,7 +64,13 @@
 const GRACE_PAST_SEC = 30;
 const RT_LOOKBACK_SEC = 45 * 60;
 const TZ = "Europe/Paris";
-const TRIP_UPDATES_URL = "https://transport.data.gouv.fr/resources/83025/download";
+/* URL finale directe : la redirection 302 de transport.data.gouv.fr est envoyée sans en-tête CORS,
+   ce qui fait avorter tout fetch navigateur cross-origin. Le serveur final (mecatran) répond lui
+   avec Access-Control-Allow-Origin en écho de l'Origin, la requête passe donc.
+   La clé apiKey est la clé publique de l'API, publiée dans les métadonnées du portail open data
+   (cible actuelle de la redirection, vérifiée à l'installation) ; si le temps réel disparaît,
+   vérifier d'abord cette cible : https://transport.data.gouv.fr/resources/83025/download */
+const TRIP_UPDATES_URL = "https://bdx.mecatran.com/utw/ws/gtfsfeed/realtime/bordeaux?apiKey=opendata-bordeaux-metropole-flux-gtfs-rt";
 
 function readVarint(u8, i) {
   let value = 0, shift = 0;

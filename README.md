@@ -62,7 +62,11 @@ GTFS courant le 20/11/2026.
 `web/index.html` est une page autonome (HTML + JS vanilla, sans dépendance) affichant les
 mêmes informations avec les mêmes règles : horaire planifié embarqué (`web/schedule24.json`,
 généré par `web/tools/generate_schedule.py`), temps réel GTFS-RT interrogé directement par le
-navigateur (CORS ouvert sur transport.data.gouv.fr). Publiez simplement les deux fichiers.
+navigateur, en interrogeant l'URL finale directe du flux GTFS-RT (`bdx.mecatran.com`, clé
+`apiKey` publique publiée dans les métadonnées du portail open data) : la redirection
+302 de `transport.data.gouv.fr` est envoyée sans en-tête CORS, ce qui fait avorter tout
+fetch navigateur cross-origin, alors que le serveur mecatran répond avec
+`Access-Control-Allow-Origin` en écho de l'Origin. Publiez simplement les deux fichiers.
 La logique pure (débogage/test possible avec node) se trouve dans le bloc
 `<script id="pure">` de la page ; voir BACKLOG.md pour les évolutions prévues.
 
