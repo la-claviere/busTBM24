@@ -71,8 +71,9 @@ fetch navigateur cross-origin, alors que le serveur mecatran répond avec
 (et idéalement aussi `icon-192.png`, `icon-512.png`, `favicon-32.png` et
 `manifest24.webmanifest`, référencés par la page). Un favicon 32/192 est aussi
 embarqué en data URI dans la page : le raccourci Android (Chrome « Ajouter à
-l'écran d'accueil ») affiche l'icône bus + 24 (palette TBM, jaune/gris) même si
-cette page n'est pas installée comme application. Icônes régénérables par
+l'écran d'accueil ») affiche l'icône « 24 » en dégradé rose→bleu sur fond blanc
+(palette TBM : rose, bleu, vert) même si cette page n'est pas installée comme
+application. Icônes régénérables par
 `web/tools/generate_icons.py` (Pillow requis).
 La logique pure (débogage/test possible avec node) se trouve dans le bloc
 `<script id="pure">` de la page ; voir BACKLOG.md pour les évolutions prévues.

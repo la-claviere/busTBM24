@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Génère les icônes de la page web (web/icon-192.png, web/icon-512.png,
-web/favicon-32.png) : un bus de face vu de face avec « 24 » sur son bandeau
-de destination, dans une palette proche TBM (jaune #FFDD00, gris #58595B).
+web/favicon-32.png) : « 24 » en très gros sur fond blanc, rempli d'un dégradé
+rose → bleu (palette TBM : rose, bleu, vert, fond blanc).
 
 Usage :
     python3 generate_icons.py
@@ -16,54 +16,44 @@ from PIL import Image, ImageDraw, ImageFont
 HERE = os.path.dirname(os.path.abspath(__file__))
 FONT = "/home/appuser/.local/lib/python3.12/site-packages/matplotlib/mpl-data/fonts/ttf/DejaVuSans-Bold.ttf"
 
-YELLOW = (255, 221, 0, 255)     # jaune TBM (fond)
-GREY = (88, 89, 91, 255)        # gris TBM (caisse du bus)
-DARK = (29, 29, 27, 255)        # bandeau de destination
-LIGHT = (238, 240, 243, 255)    # pare-brise
-
+PINK = (226, 0, 116)    # rose TBM
+BLUE = (0, 90, 170)     # bleu TBM
+WHITE = (255, 255, 255)
 S = 512
 
 
-def rounded(d, box, r, fill):
-    d.rounded_rectangle(box, radius=r, fill=fill)
+def diagonal_gradient(size, start, end):
+    w, h = size
+    img = Image.new("RGB", (w, h))
+    px = img.load()
+    for y in range(h):
+        for x in range(w):
+            t = (x + y) / (w + h - 2)
+            px[x, y] = tuple(round(s + (e - s) * t) for s, e in zip(start, end))
+    return img
 
 
-def draw_icon(scale_font=None, out_scale=None, maskable=False):
-    img = Image.new("RGBA", (S, S), (0, 0, 0, 0))
-    d = ImageDraw.Draw(img)
-    d.rounded_rectangle((0, 0, S, S), radius=0, fill=YELLOW)
+def draw_icon():
+    img = Image.new("RGB", (S, S), WHITE)
+    mask = Image.new("L", (S, S), 0)
+    d = ImageDraw.Draw(mask)
 
-    zone = 512 if not maskable else int(512 * 0.72)
-    def sc(v):
-        return int(v * zone / 512 + (512 - zone) / 2)
-
-    bus_l, bus_t, bus_r, bus_b = sc(96), sc(120), sc(416), sc(340)
-    rounded(d, (bus_l, bus_t, bus_r, bus_b), sc(44), GREY)
-
-    w_l, w_t, w_r, w_b = sc(140), sc(238), sc(372), sc(312)
-    rounded(d, (w_l, w_t, w_r, w_b), sc(18), LIGHT)
-
-    b_l, b_t, b_r, b_b = sc(120), sc(150), sc(392), sc(212)
-    rounded(d, (b_l, b_t, b_r, b_b), sc(14), DARK)
-
-    band_font = ImageFont.truetype(FONT, sc(52) if scale_font is None else scale_font(sc(52)))
-    text = "   24"
-    bb = d.textbbox((0, 0), text, font=band_font)
+    size = 300
+    text = "24"
+    while size < 460:
+        font = ImageFont.truetype(FONT, size)
+        bb = d.textbbox((0, 0), text, font=font, stroke_width=0)
+        if bb[2] - bb[0] > 360 or bb[3] - bb[1] > 300:
+            break
+        size += 8
+    bb = d.textbbox((0, 0), text, font=font)
     tw, th = bb[2] - bb[0], bb[3] - bb[1]
-    d.text(((b_l + b_r - tw) / 2 - bb[0], (b_t + b_b - th) / 2 - bb[1]),
-           text, font=band_font, fill=YELLOW)
+    d.text(((S - tw) / 2 - bb[0], (S - th) / 2 - bb[1]), text,
+           font=font, fill=255)
 
-    for cx in (sc(168), sc(344)):
-        d.ellipse((cx - sc(26), bus_b - sc(6), cx + sc(26), bus_b + sc(48)),
-                  fill=DARK)
-
-    for hx in (sc(132), sc(360)):
-        rounded(d, (hx, sc(318), hx + sc(20), sc(336)), sc(6), YELLOW)
-
-    if out_scale is None:
-        return img
-    w, h = img.size
-    return img.resize((int(w * out_scale), int(h * out_scale)), Image.LANCZOS)
+    grad = diagonal_gradient((S, S), PINK, BLUE)
+    img.paste(grad, (0, 0), mask)
+    return img
 
 
 def main():
