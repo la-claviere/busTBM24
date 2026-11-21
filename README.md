@@ -67,7 +67,13 @@ navigateur, en interrogeant l'URL finale directe du flux GTFS-RT (`bdx.mecatran.
 `apiKey` publique publiée dans les métadonnées du portail open data) : la redirection
 302 de `transport.data.gouv.fr` est envoyée sans en-tête CORS, ce qui fait avorter tout
 fetch navigateur cross-origin, alors que le serveur mecatran répond avec
-`Access-Control-Allow-Origin` en écho de l'Origin. Publiez simplement les deux fichiers.
+`Access-Control-Allow-Origin` en écho de l'Origin. Publiez `index.html` dans un dossier
+(et idéalement aussi `icon-192.png`, `icon-512.png`, `favicon-32.png` et
+`manifest24.webmanifest`, référencés par la page). Un favicon 32/192 est aussi
+embarqué en data URI dans la page : le raccourci Android (Chrome « Ajouter à
+l'écran d'accueil ») affiche l'icône bus + 24 (palette TBM, jaune/gris) même si
+cette page n'est pas installée comme application. Icônes régénérables par
+`web/tools/generate_icons.py` (Pillow requis).
 La logique pure (débogage/test possible avec node) se trouve dans le bloc
 `<script id="pure">` de la page ; voir BACKLOG.md pour les évolutions prévues.
 
