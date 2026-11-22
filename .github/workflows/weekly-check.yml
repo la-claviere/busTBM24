@@ -1,0 +1,21 @@
+name: Vérification hebdomadaire
+
+on:
+  schedule:
+    # Lundi 06:00 UTC (07:00/08:00 Paris selon l'heure d'été)
+    - cron: "0 6 * * 1"
+  workflow_dispatch: {}
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 20
+      - name: Contrôles (sécurité statique, syntaxe, flux temps réel, validité horaire)
+        run: node tools/weekly_check.mjs

@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Prochain bus 24</string>
+    <string name="subtitle">TBM — arrêt Fauré (Pessac) → Pessac Romainville</string>
+    <string name="refreshing">Mise à jour…</string>
+    <string name="refresh">Actualiser</string>
+    <string name="error" formatted="false">Erreur : %s</string>
+    <string name="error_network">Récupération impossible. Réessayez plus tard.</string>
+    <string name="cancelled">annulé</string>
+    <string name="no_more_today">Plus de passage aujourd\'hui.</string>
+    <string name="service_resumes" formatted="false">Prochain passage : %s</string>
+    <string name="gtfs_age">Données horaires :</string>
+    <string name="rt_ok">temps réel OK</string>
+    <string name="rt_missing">temps réel indisponible (horaires planifiés affichés)</string>
+    <string name="widget_waiting">En attente de données…</string>
+    <string name="widget_no_data">—</string>
+    <string name="widget_no_data_detail">Ouvrez l\'application pour charger les horaires</string>
+    <string name="widget_rt_ok">temps réel</string>
+    <string name="widget_no_rt">hors ligne — horaires planifiés</string>
+    <string name="widget_resume" formatted="false">Reprise à %s</string>
+    <string name="widget_end_of_service">Service terminé</string>
+    <string name="line_badge_desc">Ligne 24</string>
+    <string name="widget_description">Prochain passage du bus 24 à l\'arrêt Fauré vers Romainville</string>
+    <string name="widget_add_instructions">Ajoutez le widget depuis le menu de l\'écran d\'accueil (réglages > widgets > Prochain bus 24).</string>
+</resources>
