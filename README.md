@@ -78,6 +78,35 @@ application. Icônes régénérables par
 La logique pure (débogage/test possible avec node) se trouve dans le bloc
 `<script id="pure">` de la page ; voir BACKLOG.md pour les évolutions prévues.
 
+## Sécurité et frugalité de la page web
+
+- **Pas de dépendance externe** : aucun script, style ou police tiers, une seule
+  requête réseau (le flux temps réel), hors données embarquées.
+- **Pas de surface XSS** : tout l'affichage est construit en `textContent`, jamais
+  `innerHTML`/`eval` ; les données externes (protobuf GTFS-RT) ne sont utilisées
+  que comme heures et identifiants, jamais injectées en HTML/attributs.
+- **CSP stricte** en en-tête de page (`default-src 'none'`, `connect-src` limité
+  au serveur du flux, `base-uri 'none'`, `form-action 'none'`) : même en cas de
+  script injecté, le navigateur refuserait d'exécuter quoi que ce soit d'externe.
+- **`referrer: no-referrer`** : votre adresse de site n'est pas transmise au serveur
+  du flux.
+- **Frugalité** : page unique (~137 ko, gzip réduit fortement ce poids ; pensez à
+  activer gzip sur OVH), aucune animation coûteuse, rafraîchissement adaptatif
+  (60 s quand un passage est proche, 5 min sinon), **pause complète du
+  téléchargement quand l'onglet est masqué** (reprise au retour, ou toutes les
+  30 s). Point restant (backlog) : le flux GTFS-RT fait ~2,5 Mo — un relais avec
+  cache partagé le réduirait ; tracé dans BACKLOG.md.
+- **Vérification hebdomadaire automatique** : `.github/workflows/weekly-check.yml`
+  (cron lundi 06:00 UTC) lance `tools/weekly_check.mjs` qui contrôle sécurité
+  statique de la page, syntaxe JS, joignabilité + CORS + décodage du flux temps
+  réel et validité de l'horaire embarqué. Tout échec déclenche une notification
+  GitHub (e-mail). Lancable à la main : `node tools/weekly_check.mjs`.
+  Note : GitHub désactive les crons après 60 jours sans activité dans le dépôt —
+  les commits de maintenance suffisent à le maintenir actif.
+
+La page et cette application ont été générées avec l'assistance de l'IA
+(Mistral AI, agent Vibe), mention reprise en pied de page (`web/index.html`).
+
 ## Compiler
 
 ```bash
